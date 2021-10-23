@@ -1,0 +1,153 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway&display=swap");
+
+.landing {
+    .about {
+        background-color: #023e8a;
+        margin-top: -25vh;
+        height: 100vh;
+        width: 100%;
+    }
+
+    .hero {
+        background-image: linear-gradient(
+                33deg,
+                rgba(#00b4d8, 0.85) 47%,
+                rgba(#00b4d8, 0.85) 53%
+            ),
+            url("../../images/hero.jpg");
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        clip-path: polygon(0 0, 100% 0, 100% 75vh, 0 100%);
+
+        &__headers {
+            display: flex;
+            flex-direction: column;
+            font-family: "Raleway";
+            align-items: center;
+            color: #023e8a;
+            gap: 3rem;
+            height: 100%;
+            width: 40%;
+            text-align: center;
+            justify-content: center;
+            align-self: center;
+            margin-top: -15rem;
+
+            h1 {
+                font-size: 5rem;
+            }
+
+            h4 {
+                font-size: 1.5rem;
+            }
+
+            &-btn {
+                text-decoration: none;
+                font-size: 2rem;
+                background-color: #023e8a;
+                border: none;
+                font-family: "Raleway";
+                font-weight: 300;
+                color: #fff;
+                padding: 1.5rem 3rem;
+                position: relative;
+                margin-top: 3rem;
+                cursor: pointer;
+
+                &:before {
+                    content: "";
+                    position: absolute;
+                    width: 2rem;
+                    height: 2rem;
+                    top: -5px;
+                    left: -5px;
+                    border-top: 2.5px solid #023e8a;
+                    border-left: 2.5px solid #023e8a;
+                    transition: all 0.25s;
+                }
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    width: 2rem;
+                    height: 2rem;
+                    bottom: -5px;
+                    right: -5px;
+                    border-bottom: 2.5px solid #023e8a;
+                    border-right: 2.5px solid #023e8a;
+                    transition: all 0.25s;
+                }
+
+                &:hover:before,
+                &:hover:after {
+                    height: 100%;
+                    width: 100%;
+                }
+            }
+        }
+
+        &__nav {
+            display: flex;
+            justify-content: space-evenly;
+            padding: 3rem;
+
+            &-info {
+                width: 100%;
+                display: flex;
+                justify-content: flex-start;
+                gap: 3rem;
+            }
+
+            &-login {
+                width: 100%;
+                display: flex;
+                justify-content: flex-end;
+                gap: 3rem;
+            }
+
+            a {
+                text-decoration: none;
+                font-size: 2rem;
+                background-color: #023e8a;
+                border: none;
+                font-family: "Raleway";
+                font-weight: 300;
+                color: #fff;
+                padding: 1.5rem 3rem;
+                position: relative;
+                cursor: pointer;
+
+                &:before {
+                    content: "";
+                    position: absolute;
+                    width: 2rem;
+                    height: 2rem;
+                    top: -5px;
+                    left: -5px;
+                    border-top: 2.5px solid #023e8a;
+                    border-left: 2.5px solid #023e8a;
+                    transition: all 0.25s;
+                }
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    width: 2rem;
+                    height: 2rem;
+                    bottom: -5px;
+                    right: -5px;
+                    border-bottom: 2.5px solid #023e8a;
+                    border-right: 2.5px solid #023e8a;
+                    transition: all 0.25s;
+                }
+
+                &:hover:before,
+                &:hover:after {
+                    height: 100%;
+                    width: 100%;
+                }
+            }
+        }
+    }
+}
