@@ -5,15 +5,14 @@ const authRoutes = require("./routes/auth");
 const cookieParser = require("cookie-parser");
 const cors = require("cors")
 const axios = require('axios');
-const { TwitterApi } = require("twitter-api-v2");
+const { TwitterApi, ETwitterStreamEvent } = require("twitter-api-v2");
 const Sentiment = require('sentiment');
 const { response } = require("express");
-
+const sentiment = new Sentiment()
 const API_key = process.env.API_KEY  || 'lqHzaoTi7Fe6GqrcsKyovjQqu'
 const API_key_secret = process.env.API_KEY_SECRET || '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS'
 const PORT = process.env.PORT || 3001;
 const app = express();
-var sentiment = new Sentiment();
 const client = new TwitterApi({appKey: API_key, appSecret: API_key_secret})
 
 let oauthSessions = {
@@ -80,6 +79,32 @@ app.get('/retrieve-token', (req, res) => {
     res.send('');
 });
 
+async function analyzeSentimentOfUser(userId, client, maxAge) {
+    const result = await client.v1.userTimeline(userId, {
+        count: 200,
+        trim_user: true
+    }).then((timeline) => {
+        const recent = timeline.data.filter((tweet) => {
+            return (Date.now() - Date.parse(tweet.created_at)) < maxAge;
+        });
+        const sentimentSum = recent.reduce((sumSoFar, tweet) => {
+            return sumSoFar + sentiment.analyze(tweet.full_text).score;
+        }, 0);
+        return {
+            sentimentSum: sentimentSum,
+            totalTweets: recent.length
+        }
+    });
+    return result;
+}
+
+async function getFriends(userId, client) {
+    const result = await client.v1.get('friends/ids.json', { user_id: userId }).then((response) => {
+        return response.ids
+    });
+    return result;
+}
+
 // past 24 (?) hours
 app.get('/self-sentiment', async (request, response) => {
     const loggedClient = new TwitterApi({
@@ -88,40 +113,42 @@ app.get('/self-sentiment', async (request, response) => {
         accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
         accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
     });
-    loggedClient.currentUser().then((user) => {
+    loggedClient.currentUser().then(async (user) => {
         const userId = user.id_str;
-        loggedClient.v1.userTimeline(userId, {
-            count: 200,
-            trim_user: true
-        }).then((timeline) => {
-            const recent = timeline.data.filter((tweet) => {
-                return (Date.now() - Date.parse(tweet.created_at)) < (7 * 24 * 60 * 60 * 1000);
-            });
-            console.log(recent);
-            const sentimentSum = recent.reduce((sumSoFar, tweet) => {
-                return sumSoFar + sentiment.analyze(tweet.full_text).score;
-            }, 0);
-            response.json({
-                sentimentSum: sentimentSum,
-                totalTweets: recent.length
-            });
-        });
+        const sentimentAnalysis = await analyzeSentimentOfUser(userId, loggedClient, 7 * 24 * 60 * 60 * 1000);
+        response.json(sentimentAnalysis);
     });
-
 });
-
-app.get('/following-sentiment', () => {
-
-});
-
-// global, sample a few times and get confidence interval
-app.get('/global-sentiment', async (request, response) => {
+app.get('/following-sentiment', (request, response) => {
     const loggedClient = new TwitterApi({
+        appKey: 'lqHzaoTi7Fe6GqrcsKyovjQqu',
+        appSecret: '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS',
+        accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
+        accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
+    });
+    loggedClient.currentUser().then(async (user) => {
+        const friendIds = await getFriends(user.id_str, loggedClient);
+        let totalSentimentAnalysis = {
+            sentimentSum: 0,
+            totalTweets: 0
+        }
+    
+        for (const id of friendIds) {
+            const sentimentAnalysis = await analyzeSentimentOfUser(id.toString(), client, (7 * 24 * 60 * 60 * 1000));
+            totalSentimentAnalysis.sentimentSum += sentimentAnalysis.sentimentSum;
+            totalSentimentAnalysis.totalTweets += sentimentAnalysis.totalTweets;
+        }
+        response.json(totalSentimentAnalysis);
+    })
+});
+
+app.get('/home-sentiment', async (request, response) => {
+  const loggedClient = new TwitterApi({
     appKey: API_key,
     appSecret: API_key_secret,
     accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
     accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
-    });
+  });
     const homeTimeline = loggedClient.v1.homeTimeline({ exclude_replies: true });
     var total_sentiment_val = 0
     for (const tweet of homeTimeline) {
@@ -134,37 +161,62 @@ app.get('/global-sentiment', async (request, response) => {
       totalTweets: homeTimeline.length,
       sentimentAverage: avg_sentiment_val
     })
+})
   
+// global, sample a few times and get confidence interval
+app.get('/global-sentiment', async (request, response) => {
+    const loggedClient = new TwitterApi('AAAAAAAAAAAAAAAAAAAAAKNPVAEAAAAAD5%2BwPBTenhJh%2B2cd9Tg%2B7%2F1g59E%3DZfDDZQgM7xFkFc2BZVsk59SnYuJ5JJgwp2FqeN7P3yupzme1cZ');
+    const stream = await loggedClient.v2.sampleStream({
+        'tweet.fields': ['text', 'lang'],
+    });
+    let sample = []
+    stream.on(ETwitterStreamEvent.Data,
+        eventData => {
+            if (eventData.data.lang == "en") {
+                sample.push(eventData.data.text);
+            }
+        });
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    let totalScore = 0;
+    for (let t of sample) {
+        totalScore += sentiment.analyze(t).score
+    }
+    response.send({
+        totalScore: totalScore,
+        totalTweets: sample.length
+    });
 })
 
 // historical
 app.get('/self-sentiment-historical')
-app.get('/following-sentiment-historical')
 
-app.get('/global-sentiment-historical/:pastTime', async (request, response) => {
-    const loggedClient = new TwitterApi({
-    appKey: API_key,
-    appSecret: API_key_secret,
-    accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
-    accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
-    });
-    const homeTimeline = loggedClient.v1.homeTimeline({ exclude_replies: true });
-    const recent = homeTimeline.data.filter((tweet) => {
-      return (Date.now() - Date.parse(tweet.created_at)) < (request.params.pastTime * 24 * 60 * 60 * 1000);
-    })
-    var total_sentiment_val = 0
-    for (const tweet of recent) {
-      total_sentiment_val += sentiment.analyze(tweet.full_text).score
-    }
-    avg_sentiment_val = total_sentiment_val / homeTimeline.length
-    console.log("Historic Avg sentiment value from your home timeline: ", avg_sentiment_val)
-    response.json({
-      sentimentSum: total_sentiment_val,
-      totalTweets: homeTimeline.length,
-      sentimentAverage: avg_sentiment_val
-    })
+app.get('/home-sentiment-historical/:pastTime', async (request, response) => {
+  const loggedClient = new TwitterApi({
+  appKey: API_key,
+  appSecret: API_key_secret,
+  accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
+  accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
+  });
+  const homeTimeline = await loggedClient.v1.homeTimeline({ exclude_replies: true });
+  const recent = homeTimeline.data.filter((tweet) => {
+    return (Date.now() - Date.parse(tweet.created_at)) < (request.params.pastTime * 24 * 60 * 60 * 1000);
+  })
+  var total_sentiment_val = 0
+  for (const tweet of recent) {
+    total_sentiment_val += sentiment.analyze(tweet.full_text).score
+  }
+  avg_sentiment_val = total_sentiment_val / homeTimeline.length
+  console.log("Historic Avg sentiment value from your home timeline: ", avg_sentiment_val)
+  response.json({
+    sentimentSum: total_sentiment_val,
+    totalTweets: homeTimeline.length,
+    sentimentAverage: avg_sentiment_val
+  })
 })
 
+app.get('/following-sentiment-historical')
+
+app.get('/global-sentiment-historical')
 
 
 app.listen(PORT, () => {
