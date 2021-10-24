@@ -35,14 +35,15 @@ const CreatePost = () => {
     }
 
     return (
-        <div>
-            <form onSubmit={submit}>
-                <input type="text" name="caption" value={formState.caption} onChange={handleFormChange}></input>
-                <input type="file" ref={fileInput}></input>
-                <button type="submit">Submit</button>
+        <div className="createpost">
+            <form className="createpost__form" onSubmit={submit}>
+                <input className="createpost__form-caption" type="text" name="caption" value={formState.caption} onChange={handleFormChange}></input>
+                <input className="createpost__form-file" type="file" ref={fileInput}></input>
+                <button className="createpost__form-submit" type="submit">Submit</button>
             </form>
         </div>
+        
     );
-}
+} 
 
 export default CreatePost;
