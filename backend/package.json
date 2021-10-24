@@ -10,10 +10,12 @@
     "author": "",
     "license": "ISC",
     "dependencies": {
+        "axios": "^0.23.0",
         "express": "^4.17.1",
         "multer": "^1.4.3",
+        "request": "^2.88.2",
         "twitter": "^1.7.1",
-        "multer": "^1.4.3"
+        "twitter-api-v2": "^1.6.4"
     },
     "devDependencies": {
         "nodemon": "^2.0.14"

@@ -7,6 +7,10 @@
 /.pnp
 .pnp.js
 
+# https stuff
+/frontend/localhost-key.pem
+/frontend/localhost.pem
+
 # testing
 /coverage
 
