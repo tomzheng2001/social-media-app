@@ -7,8 +7,12 @@ const Sentiment = require('sentiment');
 const sentiment = new Sentiment();
 const PORT = process.env.PORT || 3001;
 
+const API_key = process.env.API_KEY  || 'lqHzaoTi7Fe6GqrcsKyovjQqu'
+const API_key_secret = process.env.API_KEY_SECRET || '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS'
+const PORT = process.env.PORT || 3001;
 const app = express();
-const client = new TwitterApi({ appKey: 'lqHzaoTi7Fe6GqrcsKyovjQqu', appSecret: '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS' })
+var sentiment = new Sentiment();
+const client = new TwitterApi({appKey: API_key, appSecret: API_key_secret})
 
 let oauthSessions = {
 
@@ -47,14 +51,14 @@ app.get('/retrieve-token', (req, res) => {
         return res.status(400).send('You denied the app or your session expired!');
     }
 
-    // Obtain the persistent tokens
-    // Create a client from temporary tokens
-    const client = new TwitterApi({
-        appKey: 'lqHzaoTi7Fe6GqrcsKyovjQqu',
-        appSecret: '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS',
-        accessToken: oauth_token,
-        accessSecret: oauth_token_secret,
-    });
+  // Obtain the persistent tokens
+  // Create a client from temporary tokens
+  const client = new TwitterApi({
+    appKey: API_key,
+    appSecret: API_key_secret,
+    accessToken: oauth_token,
+    accessSecret: oauth_token_secret,
+  });
 
     client.login(oauth_verifier)
         .then(({ client: loggedClient, accessToken, accessSecret }) => {
@@ -107,6 +111,18 @@ app.get('/global-sentiment')
 app.get('/self-sentiment-historical')
 app.get('/following-sentiment-historical')
 app.get('/global-sentiment-historical')
+
+function calculate_homeTimeline_sentiment() {
+  const homeTimeline = client.v1.homeTimeline({ exclude_replies: true });
+  var total_sentiment_val = 0
+  for (const tweet of homeTimeline) {
+    total_sentiment_val += sentiment.analyze(tweet)
+  }
+  avg_sentiment_val = total_sentiment_val / homeTimeline.length
+  console.log("Avg sentiment value from your home timeline: ", avg_sentiment_val)
+  return avg_sentiment_val
+}
+
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
