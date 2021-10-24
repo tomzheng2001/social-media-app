@@ -1,0 +1,68 @@
+.createpost {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    height: 100vh;
+
+    &__form {
+        grid-column: 5 / 9;
+        background-color: #eee;
+        display: flex;
+        flex-direction: column;
+        align-self: center;
+        align-items: center;
+        gap: 3rem;
+
+        &-caption {
+
+        }
+
+        &-file {
+            align-self: center;
+            width: 80%;
+        }
+
+        &-submit {
+            text-decoration: none;
+            font-size: 2rem;
+                background-color: #023e8a;
+                border: none;
+                font-family: "Raleway";
+                font-weight: 300;
+                color: #fff;
+                padding: 1.5rem 3rem;
+                position: relative;
+                margin-top: 3rem;
+                cursor: pointer;
+
+                &:before {
+                    content: "";
+                    position: absolute;
+                    width: 2rem;
+                    height: 2rem;
+                    top: -5px;
+                    left: -5px;
+                    border-top: 2.5px solid #023e8a;
+                    border-left: 2.5px solid #023e8a;
+                    transition: all 0.25s;
+                }
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    width: 2rem;
+                    height: 2rem;
+                    bottom: -5px;
+                    right: -5px;
+                    border-bottom: 2.5px solid #023e8a;
+                    border-right: 2.5px solid #023e8a;
+                    transition: all 0.25s;
+                }
+
+                &:hover:before,
+                &:hover:after {
+                    height: 100%;
+                    width: 100%;
+                }
+        }
+    }
+}

@@ -1,6 +1,9 @@
 const express = require("express");
 const multer = require("multer");
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({dest: 'uploads/'});
+const authRoutes = require("./routes/auth");
+const cookieParser = require("cookie-parser");
+const cors = require("cors")
 const axios = require('axios');
 const { TwitterApi, ETwitterStreamEvent } = require("twitter-api-v2");
 const Sentiment = require('sentiment');
@@ -15,6 +18,13 @@ const client = new TwitterApi({appKey: API_key, appSecret: API_key_secret})
 let oauthSessions = {
 
 };
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors())
+
+app.use(authRoutes);
 
 app.post('/create-post', upload.single('media'), (request, response) => {
     console.log(request.body);
@@ -132,6 +142,27 @@ app.get('/following-sentiment', (request, response) => {
     })
 });
 
+app.get('/home-sentiment', async (request, response) => {
+  const loggedClient = new TwitterApi({
+    appKey: API_key,
+    appSecret: API_key_secret,
+    accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
+    accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
+  });
+    const homeTimeline = loggedClient.v1.homeTimeline({ exclude_replies: true });
+    var total_sentiment_val = 0
+    for (const tweet of homeTimeline) {
+      total_sentiment_val += sentiment.analyze(tweet.full_text).score
+    }
+    avg_sentiment_val = total_sentiment_val / homeTimeline.length
+    console.log("Avg sentiment value from your home timeline: ", avg_sentiment_val)
+    response.json({
+      sentimentSum: total_sentiment_val,
+      totalTweets: homeTimeline.length,
+      sentimentAverage: avg_sentiment_val
+    })
+})
+  
 // global, sample a few times and get confidence interval
 app.get('/global-sentiment', async (request, response) => {
     const loggedClient = new TwitterApi('AAAAAAAAAAAAAAAAAAAAAKNPVAEAAAAAD5%2BwPBTenhJh%2B2cd9Tg%2B7%2F1g59E%3DZfDDZQgM7xFkFc2BZVsk59SnYuJ5JJgwp2FqeN7P3yupzme1cZ');
@@ -158,19 +189,34 @@ app.get('/global-sentiment', async (request, response) => {
 
 // historical
 app.get('/self-sentiment-historical')
-app.get('/following-sentiment-historical')
-app.get('/global-sentiment-historical')
 
-function calculate_homeTimeline_sentiment() {
-  const homeTimeline = client.v1.homeTimeline({ exclude_replies: true });
+app.get('/home-sentiment-historical/:pastTime', async (request, response) => {
+  const loggedClient = new TwitterApi({
+  appKey: API_key,
+  appSecret: API_key_secret,
+  accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
+  accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
+  });
+  const homeTimeline = await loggedClient.v1.homeTimeline({ exclude_replies: true });
+  const recent = homeTimeline.data.filter((tweet) => {
+    return (Date.now() - Date.parse(tweet.created_at)) < (request.params.pastTime * 24 * 60 * 60 * 1000);
+  })
   var total_sentiment_val = 0
-  for (const tweet of homeTimeline) {
-    total_sentiment_val += sentiment.analyze(tweet)
+  for (const tweet of recent) {
+    total_sentiment_val += sentiment.analyze(tweet.full_text).score
   }
   avg_sentiment_val = total_sentiment_val / homeTimeline.length
-  console.log("Avg sentiment value from your home timeline: ", avg_sentiment_val)
-  return avg_sentiment_val
-}
+  console.log("Historic Avg sentiment value from your home timeline: ", avg_sentiment_val)
+  response.json({
+    sentimentSum: total_sentiment_val,
+    totalTweets: homeTimeline.length,
+    sentimentAverage: avg_sentiment_val
+  })
+})
+
+app.get('/following-sentiment-historical')
+
+app.get('/global-sentiment-historical')
 
 
 app.listen(PORT, () => {

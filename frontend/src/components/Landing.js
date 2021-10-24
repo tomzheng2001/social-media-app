@@ -12,8 +12,8 @@ const Landing = () => {
                         <a href="#">How it Works</a>
                     </div>
                     <div className="hero__nav-login">
-                        <a href="#">Register</a>
-                        <a href="#">Login</a>
+                        <a href="/register">Register</a>
+                        <a href="/login">Login</a>
                     </div>
                 </div>
                 <div className="hero__headers">
