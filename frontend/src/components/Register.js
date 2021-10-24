@@ -67,10 +67,10 @@ const Register = () => {
             <div className="register">
                 {showSuccess()}
                 <h1 className="register__heading">Register</h1>
-                <input type="text" onChange={handleRegisterChange("username")} className="register__username"/>
-                <input onChange={handleRegisterChange("email")} type="email" className="register__email"/>
-                <input onChange={handleRegisterChange("password")} type="password" className="register__password"/>
-                <input onChange={handleRegisterChange("confirm_password")} type="password" className="register__confirmpassword"/>
+                <input autoComplete="off" placeholder="Username" type="text" onChange={handleRegisterChange("username")} className="register__username"/>
+                <input autoComplete="off" placeholder="Email Address" onChange={handleRegisterChange("email")} type="email" className="register__email"/>
+                <input autoComplete="off" placeholder="Password" onChange={handleRegisterChange("password")} type="password" className="register__password"/>
+                <input autoComplete="off" placeholder="Confirm Password" onChange={handleRegisterChange("confirm_password")} type="password" className="register__confirmpassword"/>
                 <a href="#" className="register__button" onClick={clickSubmit}>Register</a>
             </div>
         </div>

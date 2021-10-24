@@ -77,8 +77,8 @@ const Login = () => {
             {redirectToDashboard()}
             <div className="signin">
                 <h1 className="signin__heading">Login</h1>
-                <input onChange={handleLoginChange("email")} type="email" className="signin__email"/>
-                <input onChange={handleLoginChange("password")} type="password" className="signin__password"/>
+                <input placeholder="Email Address" onChange={handleLoginChange("email")} type="email" className="signin__email"/>
+                <input placeholder="Password" onChange={handleLoginChange("password")} type="password" className="signin__password"/>
                 <a href="#" className="signin__but" onClick={clickSubmit}>Login</a>
             </div>
         </div>
