@@ -14,7 +14,7 @@ const getColoredText = (val) => {
 
     if (val > 0) {
         let red = 0
-        let green = 255 * (val / 5)
+        let green = Math.round(255 * (val / 5))
         let blue = 0
         col = rgbToHex(red, green, blue)
     }
@@ -22,43 +22,57 @@ const getColoredText = (val) => {
         col = 'black'
     }
     else {
-        let red = 255 * (-val / 5)
+        let red = Math.round(255 * (-val / 5))
         let green = 0
         let blue = 0
         col = rgbToHex(red, green, blue)
     }
-    console.log(col);
-    return <p style={{color: col}}>{val}</p>
+    let key = Math.random();
+    return <p style={{color: col}} key={key}>{val}</p>
+}
+
+function useFetch(url) {
+    const [response, setResponse] = useState(null)
+    const [loading, setLoading] = useState(false)
+    const [hasError, setHasError] = useState(false)    
+    useEffect(() => {
+        setLoading(true)
+        fetch(url)
+            .then(x => x.json()).then((res) => {
+                console.log(res);
+            setResponse(res)
+            setLoading(false)
+        })
+            .catch(() => {
+                setHasError(true)
+                setLoading(false)
+            })
+    }, [url]);
+    return [response,loading,hasError];
 }
 
 const VisualizeSentiment = () => {
-    const [recentSentiments, setRecentSentiments] = useState({});
+    const [selfSentimentResponse, selfSentimentLoading, selfSentimentError] = useFetch('/self-sentiment');
+    const [followingSentimentResponse, followingSentimentLoading, followingSentimentError] = useFetch('/following-sentiment');
+    const [globalSentimentResponse, globalSentimentLoading, globalSentimentError] = useFetch('/global-sentiment');
+    console.log(selfSentimentLoading);
+    const SentimentBox = (props) => {
+        let val = 0
+        if (props.response) {
+            val = getColoredText(props.response.sentimentSum / props.response.totalTweets)
+        }
+        return (
+            <div>
+                { props.loading ? 'Loading' : props.error ? 'Error' : val}
+            </div>
+        );
+    }
 
-    useEffect(() => {
-        fetch('/self-sentiment').then(resp => resp.json()).then((v) => {
-            setRecentSentiments({
-                ...recentSentiments,
-                selfSentiment: v
-            })
-        })
-        fetch('/following-sentiment').then(resp => resp.json()).then((v) => {
-            setRecentSentiments({
-                ...recentSentiments,
-                followingSentiment: v
-            })
-        })
-        fetch('/global-sentiment').then(resp => resp.json()).then((v) => {
-            setRecentSentiments({
-                ...recentSentiments,
-                globalSentiment: v
-            })
-        })
-    }, []);
-
-    const sentiments = Object.entries(recentSentiments).map((entry) => getColoredText(entry.value.sentimentSum / entry.value.totalTweets));
     return (
         <div>
-            {sentiments}
+            <SentimentBox response={selfSentimentResponse} loading={selfSentimentLoading} error={selfSentimentError}></SentimentBox>
+            <SentimentBox response={followingSentimentResponse} loading={followingSentimentLoading} error={followingSentimentError}></SentimentBox>
+            <SentimentBox response={globalSentimentResponse} loading={globalSentimentLoading} error={globalSentimentError}></SentimentBox>
         </div>
     )
 }

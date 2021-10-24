@@ -181,6 +181,7 @@ app.get('/global-sentiment', async (request, response) => {
             }
         });
     await new Promise(resolve => setTimeout(resolve, 10000));
+    stream.close();
     let totalScore = 0;
     for (let t of sample) {
         totalScore += sentiment.analyze(t).score
