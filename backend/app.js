@@ -76,7 +76,10 @@ app.get('/retrieve-token', (req, res) => {
             loggedClient.v1.tweet('hello!');
         })
         .catch(() => res.status(403).send('Invalid verifier or access tokens!'));
-    res.send('');
+    res.send({
+      token: accessToken,
+      secret: accessSecret
+    });
 });
 
 async function analyzeSentimentOfUser(userId, client, maxAge) {
@@ -119,6 +122,7 @@ app.get('/self-sentiment', async (request, response) => {
         response.json(sentimentAnalysis);
     });
 });
+
 app.get('/following-sentiment', (request, response) => {
     const loggedClient = new TwitterApi({
         appKey: 'lqHzaoTi7Fe6GqrcsKyovjQqu',
