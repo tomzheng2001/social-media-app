@@ -71,9 +71,9 @@ app.get('/retrieve-token', (req, res) => {
 });
 
 function calculate_homeTimeline_sentiment() {
-  const homeTimeline = await client.v1.homeTimeline({ exclude_replies: true });
+  const homeTimeline = client.v1.homeTimeline({ exclude_replies: true });
   var total_sentiment_val = 0
-  for await (const tweet of homeTimeline) {
+  for (const tweet of homeTimeline) {
     total_sentiment_val += sentiment.analyze(tweet)
   }
   avg_sentiment_val = total_sentiment_val / homeTimeline.length
