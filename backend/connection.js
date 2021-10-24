@@ -4,7 +4,7 @@ const dotenv = require('dotenv');
 dotenv.config({ path: './.env'});
 
 var mysqlConnection = mysql.createConnection({
-    host: "localhost",
+    socketPath: "/var/run/mysqld/mysqld.sock",
     user: "root",
     password: "testing123",
     database: "mediaape",

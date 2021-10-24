@@ -23,7 +23,7 @@ const Landing = () => {
                         elit. Harum, odit! Dolorum ab sequi eos perferendis odit
                         suscipit, consectetur at laboriosam!
                     </h4>
-                    <a className="hero__headers-btn">Get Started</a>
+                    <a className="hero__headers-btn" href="/visualize">Get Started</a>
                 </div>
             </div>
             <div className="about"></div>
