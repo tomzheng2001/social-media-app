@@ -107,8 +107,8 @@ app.get('/following-sentiment', () => {
 // global, sample a few times and get confidence interval
 app.get('/global-sentiment', async (request, response) => {
     const loggedClient = new TwitterApi({
-    appKey: 'lqHzaoTi7Fe6GqrcsKyovjQqu',
-    appSecret: '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS',
+    appKey: API_key,
+    appSecret: API_key_secret,
     accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
     accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
     });
@@ -130,7 +130,30 @@ app.get('/global-sentiment', async (request, response) => {
 // historical
 app.get('/self-sentiment-historical')
 app.get('/following-sentiment-historical')
-app.get('/global-sentiment-historical')
+
+app.get('/global-sentiment-historical/:pastTime', async (request, response) => {
+    const loggedClient = new TwitterApi({
+    appKey: API_key,
+    appSecret: API_key_secret,
+    accessToken: '1239705480068358144-j6NaioYAf9lJhnmmuXAdKzhkDMCQt2',
+    accessSecret: 'vMAl5whPvzPKBQSf05EuMzZQm7q1kto00y28gInY764GC'
+    });
+    const homeTimeline = loggedClient.v1.homeTimeline({ exclude_replies: true });
+    const recent = homeTimeline.data.filter((tweet) => {
+      return (Date.now() - Date.parse(tweet.created_at)) < (request.params.pastTime * 24 * 60 * 60 * 1000);
+    })
+    var total_sentiment_val = 0
+    for (const tweet of recent) {
+      total_sentiment_val += sentiment.analyze(tweet.full_text).score
+    }
+    avg_sentiment_val = total_sentiment_val / homeTimeline.length
+    console.log("Historic Avg sentiment value from your home timeline: ", avg_sentiment_val)
+    response.json({
+      sentimentSum: total_sentiment_val,
+      totalTweets: homeTimeline.length,
+      sentimentAverage: avg_sentiment_val
+    })
+})
 
 
 
