@@ -59,11 +59,11 @@ const Login = () => {
             return (
                 <Redirect
                     to={{
-                        pathname: "/profile",
+                        pathname: "/auth-twitter",
                         state: {
                             user: data,
                             userId: userId,
-                            page: "profile"
+                            page: "auth-twitter"
                         },
                     }}
                 />
