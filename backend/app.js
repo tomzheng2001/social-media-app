@@ -182,7 +182,7 @@ app.get('/global-sentiment', async (request, response) => {
         totalScore += sentiment.analyze(t).score
     }
     response.send({
-        totalScore: totalScore,
+        sentimentSum: totalScore,
         totalTweets: sample.length
     });
 })
