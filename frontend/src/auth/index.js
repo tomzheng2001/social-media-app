@@ -51,3 +51,11 @@ export const signup = (user) => {
             console.log(err);
         });
 };
+
+export const retriveTokens = () => {
+    return fetch(`${API}/retrieve-token`).then((response) => {
+        return response.json();
+    }).catch((err) => {
+        console.log(err);
+    })
+};
