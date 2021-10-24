@@ -5,6 +5,7 @@ import CreatePost from "./components/CreatePost";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import AuthorizeTwitter from "./components/AuthorizeTwitter";
+import VisualizeSentiment from "./components/VisualizeSentiment";
 
 const Routes = () => {
     return (
@@ -15,6 +16,7 @@ const Routes = () => {
                 <Route path="/register" exact component={Register} />
                 <Route path="/upload" exact component={CreatePost} />
                 <Route path="/auth-twitter" exact component={AuthorizeTwitter} />
+                <Route path="/visualize" exact component={VisualizeSentiment} />
             </Switch>
         </BrowserRouter>
     );
