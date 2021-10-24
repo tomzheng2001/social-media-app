@@ -6,12 +6,12 @@ const { TwitterApi } = require("twitter-api-v2");
 var Sentiment = require('sentiment');
 
 
-const API_key = process.env.API_KEY
-const API_key_secret = process.env.API_KEY_SECRET
+const API_key = process.env.API_KEY  || 'lqHzaoTi7Fe6GqrcsKyovjQqu'
+const API_key_secret = process.env.API_KEY_SECRET || '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS'
 const PORT = process.env.PORT || 3001;
 const app = express();
 var sentiment = new Sentiment();
-const client = new TwitterApi({appKey: 'lqHzaoTi7Fe6GqrcsKyovjQqu', appSecret: '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS'})
+const client = new TwitterApi({appKey: API_key, appSecret: API_key_secret})
 
 let oauthSessions = {
 
@@ -53,8 +53,8 @@ app.get('/retrieve-token', (req, res) => {
   // Obtain the persistent tokens
   // Create a client from temporary tokens
   const client = new TwitterApi({
-    appKey: 'lqHzaoTi7Fe6GqrcsKyovjQqu',
-    appSecret: '1k9rC64dmn6kfLWSEzoc2l3bOka5hyMP5iPVdgC2iuHFQL6XNS',
+    appKey: API_key,
+    appSecret: API_key_secret,
     accessToken: oauth_token,
     accessSecret: oauth_token_secret,
   });
