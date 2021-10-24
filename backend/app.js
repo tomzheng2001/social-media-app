@@ -173,7 +173,7 @@ app.get('/home-sentiment', async (request, response) => {
             sentimentAverage: avg_sentiment_val
         })
     });
-})
+});
 
 // global, sample a few times and get confidence interval
 app.get('/global-sentiment', async (request, response) => {
@@ -198,7 +198,7 @@ app.get('/global-sentiment', async (request, response) => {
         sentimentSum: totalScore,
         totalTweets: sample.length
     });
-})
+});
 
 // historical
 app.get('/self-sentiment-historical')
@@ -225,12 +225,15 @@ app.get('/home-sentiment-historical/:pastTime', async (request, response) => {
         totalTweets: homeTimeline.length,
         sentimentAverage: avg_sentiment_val
     })
-})
+});
 
 app.get('/following-sentiment-historical')
 
 app.get('/global-sentiment-historical')
 
+app.get('*', (req, res) => {
+  res.redirect('/');
+});
 
 app.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
