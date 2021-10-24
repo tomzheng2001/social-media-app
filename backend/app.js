@@ -1,6 +1,9 @@
 const express = require("express");
 const multer = require("multer");
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({dest: 'uploads/'});
+const authRoutes = require("./routes/auth");
+const cookieParser = require("cookie-parser");
+const cors = require("cors")
 const axios = require('axios');
 const { TwitterApi } = require("twitter-api-v2");
 const Sentiment = require('sentiment');
@@ -16,6 +19,13 @@ const client = new TwitterApi({appKey: API_key, appSecret: API_key_secret})
 let oauthSessions = {
 
 };
+
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
+app.use(cookieParser());
+app.use(cors())
+
+app.use(authRoutes);
 
 app.post('/create-post', upload.single('media'), (request, response) => {
     console.log(request.body);
