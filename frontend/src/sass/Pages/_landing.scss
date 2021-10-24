@@ -4,8 +4,17 @@
     .about {
         background-color: #023e8a;
         margin-top: -25vh;
-        height: 100vh;
+        height: 125vh;
         width: 100%;
+        display: flex;
+        flex-direction: row;
+
+        // &__card {
+
+        //     svg {
+
+        //     }
+        // }
     }
 
     .hero {
