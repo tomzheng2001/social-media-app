@@ -76,7 +76,7 @@ app.get('/retrieve-token', (req, res) => {
             loggedClient.v1.tweet('hello!');
         })
         .catch(() => res.status(403).send('Invalid verifier or access tokens!'));
-    res.send({
+    res.json({
       token: accessToken,
       secret: accessSecret
     });
