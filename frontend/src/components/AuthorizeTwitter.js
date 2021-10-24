@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import "../sass/main.scss";
 
 const AuthorizeTwitter = () => {
     const [url, setUrl] = useState('');
@@ -19,9 +20,12 @@ const AuthorizeTwitter = () => {
     }
 
     return (
-        <button onClick={handleClick}>
-            Authorize Twitter
-        </button>
+        <div className="authorize_bg">
+            <button className="authorize" onClick={handleClick}>
+                Authorize Twitter
+            </button>
+        </div>
+        
     )
 }
 

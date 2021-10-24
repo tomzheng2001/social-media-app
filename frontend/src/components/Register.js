@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link, Redirect } from "react-router-dom";
-import { signin, signup, authenticate, retriveTokens } from "../auth";
+import { signin, signup, authenticate } from "../auth";
 import "../sass/main.scss";
 
 const Register = () => {
