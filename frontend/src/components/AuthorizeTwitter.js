@@ -8,7 +8,11 @@ const AuthorizeTwitter = () => {
     }, []);
 
     const handleClick = () => {
-        window.location = url;
+        const openedWindow = window.open(url);
+        setInterval(() => {
+            if (!openedWindow.location.origin.includes('twitter'))
+                openedWindow.close();
+        }, 500)
     }
 
     return (
