@@ -8,13 +8,45 @@
         width: 100%;
         display: flex;
         flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 8rem;
+        padding: 12rem;
+      
 
-        // &__card {
+        &__card {
 
-        //     svg {
+            background-color: $secondary-color;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+            align-items: center;
+            font-family: 'Raleway';
+            height: 60vh;
+            margin-top: 5rem;
+            border-radius: 2rem;
 
-        //     }
-        // }
+            &:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 2rem 4rem rgba(#000, 0.8);
+            }
+
+            svg {
+                width: 10rem;
+                height: 10rem;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+                text-align: center;
+            }
+
+            h4 {
+                font-size: 1.5rem;
+                text-align: center;
+            }
+        }
     }
 
     .hero {
